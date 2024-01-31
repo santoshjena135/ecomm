@@ -1,0 +1,17 @@
+.product-listing-component-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-gap: 100px;
+    text-align: center;
+  }
+.product-in-PLP{
+    padding: 10px;
+}
+.product-image-container{
+    width: auto;
+}
+.plp-filter
+{
+    overflow: auto;
+    margin-top: 20px;
+}

@@ -1,0 +1,33 @@
+{ 
+    "category" : "men",
+
+    "products" : [{
+        "name":"Red-Tshirt",
+        "price":"400",
+        "imgsrc":""
+    }, {
+        "name":"Painted Trouser",
+        "price":"700",
+        "imgsrc":""
+    },{
+        "name":"White Loafers",
+        "price":"780",
+        "imgsrc":""
+    },{
+        "name":"Leather Wallet",
+        "price":"999",
+        "imgsrc":""
+    },{
+        "name":"Party Jeans",
+        "price":"475",
+        "imgsrc":""
+    },{
+        "name":"Summers Coat",
+        "price":"1599",
+        "imgsrc":""
+    },{
+        "name":"Black Hoodie",
+        "price":"1899",
+        "imgsrc":""
+    }]
+}

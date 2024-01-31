@@ -1,0 +1,13 @@
+.navbar-container{
+    align-items: center;
+    overflow: auto;
+    background-color: antiquewhite;
+}
+.category-button{
+    padding: 10px;
+    float: left;
+}
+.nav-account-button{
+    float: right;
+    padding: 10px;
+}

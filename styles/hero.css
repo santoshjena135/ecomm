@@ -1,0 +1,23 @@
+.hero-container{
+    align-items: center;
+    overflow: auto;
+    text-align: center;
+    padding: 10px;
+}
+.hero-image{
+    display: inline-block;
+    position: relative;
+}
+.cta-btn{
+    
+    transform: translateX(-50%);
+    border-radius: 5px;
+    padding: 10px;
+    padding-inline: 50px;
+    background-color: aliceblue;
+    position: absolute;
+    z-index: 10;
+    bottom: 10%;
+    left: 50%;
+    cursor: pointer;
+}
