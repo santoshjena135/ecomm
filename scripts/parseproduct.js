@@ -11,7 +11,7 @@ async function populateProductsAPIbyprodID(prodID)
                         <p class="lead">${data.description}</p>
                         <p><em>${data.rating.count} users have rated this product ${data.rating.rate}/5.0 on average.</em></p>
                         <h5>${data.price} USD</h5>
-                        <div class="btn btn-primary btn-add-to-cart" onclick="addProductToCart(${prodID})">ADD TO CART</div>`;
+                        <div class="btn btn-primary btn-add-to-cart" onclick="updateCart(${prodID},'add')">ADD TO CART</div>`;
     prodimgdiv.innerHTML = imgdivstr;
     prodDetailsdiv.innerHTML = prodDetails;
 

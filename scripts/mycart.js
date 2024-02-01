@@ -1,19 +1,19 @@
 
 
-function addProductToCart(prodID)
+function updateCart(prodID,upType)
 {
-
-    if(getCookie("cart_prodid_"+prodID))
-    {
-        let currentVal = parseInt(getCookie("cart_prodid_"+prodID));
-        console.log("Cookie existed with value = "+currentVal);
-        document.cookie = "cart_prodid_"+prodID+"="+(currentVal+1);
-        console.log("Cookie updated with new value = "+(currentVal+1));
-    }
-    else{
-        document.cookie = "cart_prodid_"+prodID+"="+1;
-        console.log("Cookie created with value = 1");
-    }
+    $.ajax({
+        url: 'http://localhost:3000/cart', // Replace with your API endpoint
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ productID: prodID, updateType: upType }),
+        success: function(data) {
+          console.log("Success");
+        },
+        error: function(xhr, status, error) {
+          console.log("Failed");
+        }
+      });
 }
 
 var delete_cookie = function(cookiename) {
@@ -42,75 +42,70 @@ function removeProductFromCart(prodID)
         }
     }
     else{
-        //document.cookie = "cart_prodid_"+prodID+"="+0;
         console.log("No Cookie for product was ever created");
     }
 }
 
-function getCookie(cname) {
-    let name = cname + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(';');
-    for(let i = 0; i <ca.length; i++) {
-      let c = ca[i];
-      while (c.charAt(0) == ' ') {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
-      }
+ function updateCartPagePrices(price,updateType){
+    if(updateType=="increment"){
+        document.querySelector(".totalCartValueWODTarget").innerHTML = parseFloat(document.querySelector(".totalCartValueWODTarget").innerHTML) + price;
+    
     }
-    return "";
-  }
+    else if(updateType=="decrement")
+    {
+        document.querySelector(".totalCartValueWODTarget").innerHTML = parseFloat(document.querySelector(".totalCartValueWODTarget").innerHTML) - price;
 
-async function fetchCartDetails(){
-    var allcookies = document.cookie;
-    cookiearray = allcookies.split(';');
-    const cartProdList = document.querySelector(".cartitemslist");
-    var total_cart_value = 0;
-    var total_items_count = 0;
-    // Now take key value pair out of this array
-    let pattern = /cart_prodid_/;
-    for(var i=0; i<cookiearray.length; i++) {
-       keyname = cookiearray[i].split('=')[0];
-       value = cookiearray[i].split('=')[1];
-       if(pattern.test(keyname)){
-            total_items_count++;
-            var prodIDforCookie = parseInt(keyname.trim().substring(12));
-            var prodQty = parseInt(value);
-            //console.log(keyname);
-            const response = await fetch(`https://fakestoreapi.com/products/${prodIDforCookie}`);
-            var data = await response.json();
+    }
+    $("span.totalCartValueWDTarget").html(parseFloat(document.querySelector(".totalCartValueWODTarget").innerHTML)+5.00);
+}
 
-            total_cart_value += (parseFloat(data.price)*prodQty);
+function fetchCartDetailsFromServer(){
+ $.ajax({
+    url: "http://localhost:3000/cart",
+    type: 'GET',
+    success: function(data){
+        const fetchData = async () => {
+        const arr = Object.entries(data);
+        console.log(arr);
+        var total_cart_value = 0;
+        var total_items_count = 0;
+        console.log(total_cart_value);
+        const cartProdList = document.querySelector(".cartitemslist");
+        for (const [prodID,qty] of arr){
+            //const val = array[i].value;
+            //console.log(`ID: ${prodID} Count: ${qty}`);
+            total_items_count++; 
+            const response = await fetch(`https://fakestoreapi.com/products/${prodID}`);
+            var proddata = await response.json();
 
+            total_cart_value += (parseFloat(proddata.price)*qty);
             let cartProdElementStr = `
             <div class="row mb-4 d-flex justify-content-between align-items-center">
             <div class="col-md-2 col-lg-2 col-xl-2">
                 <img
-                src="${data.image}"
-                class="img-fluid rounded-3" alt="${data.title}">
+                src="${proddata.image}"
+                class="img-fluid rounded-3" alt="${proddata.title}">
             </div>
             <div class="col-md-3 col-lg-3 col-xl-3">
-                <h6 class="text-muted">${data.category}</h6>
-                <h6 class="text-black mb-0">${data.title}</h6>
+                <h6 class="text-muted">${proddata.category}</h6>
+                <h6 class="text-black mb-0">${proddata.title}</h6>
             </div>
             <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
                 <button class="btn btn-outline-danger"
-                onclick="this.parentNode.querySelector('input[type=number]').stepDown();removeProductFromCart(${prodIDforCookie});updateCartPagePrices();">
+                onclick="this.parentNode.querySelector('input[type=number]').stepDown();updateCart(${prodID},'remove');updateCartPagePrices(${proddata.price},'decrement');">
                 -
                 </button>
 
-                <input id="form1" min="0" name="quantity" value="${prodQty}" type="number"
+                <input id="form1" min="0" name="quantity" value="${qty}" type="number"
                 class="form-control form-control-sm" />
 
                 <button class="btn btn-outline-success"
-                onclick="this.parentNode.querySelector('input[type=number]').stepUp();addProductToCart(${prodIDforCookie});updateCartPagePrices();">
+                onclick="this.parentNode.querySelector('input[type=number]').stepUp();updateCart(${prodID},'add');updateCartPagePrices(${proddata.price},'increment');">
                 +
                 </button>
             </div>
             <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                <h6 class="mb-0">${parseFloat(data.price)*prodQty} USD</h6>
+                <h6 class="mb-0">${parseFloat(proddata.price)} USD /unit</h6>
             </div>
             <div class="col-md-1 col-lg-1 col-xl-1 text-end">
                 <a href="#!" class="text-muted"><i class="fas fa-times"></i></a>
@@ -119,23 +114,18 @@ async function fetchCartDetails(){
             <hr class="my-4">`;
 
             cartProdList.innerHTML += cartProdElementStr;
-            //console.log("Key is : " + keyname + " and Value is : " + value);
-       }
+        }
+        updatePrices();
+        function updatePrices(){
+            document.querySelector(".totalCartValueWODTarget").innerHTML = total_cart_value;
+            $("span.totalNumberofItemsTarget").html(total_items_count);
+            $("span.totalCartValueWDTarget").html(total_cart_value+5.00);
+        }
     }
-    updatePrices();
-    function updatePrices(){
-        document.querySelector(".totalCartValueWODTarget").innerHTML = total_cart_value;
-        $("span.totalNumberofItemsTarget").html(total_items_count);
-        $("span.totalCartValueWDTarget").html(total_cart_value+5.00);
-    } //jquery library dependency
-    // document.querySelector(".totalNumberofItemsTarget").innerHTML = total_items_count;
-    // document.querySelector(".totalNumberofItemsTargets").innerHTML = total_items_count;
- }
-
- fetchCartDetails();
-
- function updateCartPagePrices(){
-    document.querySelector(".totalCartValueWODTarget").innerHTML = total_cart_value;
-    $("span.totalNumberofItemsTarget").html(total_items_count);
-    $("span.totalCartValueWDTarget").html(total_cart_value+5.00);
+    fetchData()},
+    error: function(err){
+        console.log("Error fetching products from Cart.");
+    }
+ })
 }
+fetchCartDetailsFromServer();
