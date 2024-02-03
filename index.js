@@ -4,6 +4,7 @@ const app = express();
 const port = 5050;
 
 app.set('view engine', 'ejs');
+app.use(express.static('scripts'));
 app.get('/product/:id', async (req, res) => {
     const productId = parseInt(req.params.id);
     try{
