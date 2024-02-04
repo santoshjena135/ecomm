@@ -5,6 +5,7 @@ const port = 5050;
 
 app.set('view engine', 'ejs');
 app.use(express.static('scripts'));
+app.use(express.static(__dirname)); //can server static html files on same level as this index.js ex: index.html, cart.html on port 5050
 app.get('/product/:id', async (req, res) => {
     const productId = parseInt(req.params.id);
     try{
