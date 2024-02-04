@@ -30,5 +30,5 @@ app.post("/cart", (req, res) => {
 });
 
 app.listen(PORT,()=>{
-    console.log("Server Running on PORT:"+PORT);
+    console.log("Cart Service running on PORT:"+PORT);
 })
