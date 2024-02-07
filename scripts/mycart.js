@@ -3,7 +3,7 @@
 function updateCart(prodID,upType)
 {
     $.ajax({
-        url: 'http://localhost:3000/cart', // Replace with your API endpoint
+        url: '/cart', // Replace with your API endpoint
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({ productID: prodID, updateType: upType }),
@@ -61,7 +61,7 @@ function removeProductFromCart(prodID)
 
 function fetchCartDetailsFromServer(){
  $.ajax({
-    url: "http://localhost:3000/cart",
+    url: "/cart",
     type: 'GET',
     success: function(data){
         const fetchData = async () => {

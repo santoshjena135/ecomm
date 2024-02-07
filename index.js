@@ -1,4 +1,5 @@
 const express = require('express');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 const axios = require('axios');
 const app = express();
 const port = 5050;
@@ -6,6 +7,8 @@ const port = 5050;
 app.set('view engine', 'ejs');
 app.use(express.static('scripts'));
 app.use(express.static(__dirname)); //can server static html files on same level as this index.js ex: index.html, cart.html on port 5050
+app.use('/cart', createProxyMiddleware({ target: 'http://localhost:3000', changeOrigin: true }));
+
 app.get('/product/:id', async (req, res) => {
     const productId = parseInt(req.params.id);
     try{

@@ -17,7 +17,7 @@ async function populateProductsAPIbyCategory(categoryType)
                                     </div>
                                     <div class="col">
                                         <a href="/productpage.html?prodid=${data[i].id}" class="btn btn-primary">View</a>
-                                        <a href="http://localhost:5050/product/${data[i].id}" class="btn btn-primary">SSR-View</a>
+                                        <a href="/product/${data[i].id}" class="btn btn-primary">SSR-View</a>
                                         </div>
                                 </div>
                             </div>
