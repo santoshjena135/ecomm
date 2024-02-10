@@ -27,10 +27,46 @@
             </div>
           </div>
 
+        <!-- Popup Cart Container -->
+        <div id="popup-cart" class="popup-cart">
+            <div id="cart-items" class="cart-items">
+                <!-- Cart items will be displayed here -->
+                <div>Product 1 - 10 USD</div>
+                <div>Product 2 - 50 USD</div>
+                <div>Product 3 - 15 USD</div>
+            </div>
+            <div class="cart-actions">
+                <!-- Buttons for checkout, close, etc. -->
+                <div class="row">
+                    <div class="col-6">
+                        <div class="btn btn-primary" onclick="">Checkout</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="btn btn-danger" onclick="hideMiniCart();">Close</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
           <div class="globalfooter"></div>
         <script src="/scripts/header.js"></script>
         <script src="/scripts/parseproduct.js"></script>
         <script src="/scripts/footer.js"></script>
         <script src="/scripts/mycart.js"></script>
+        <script src="/scripts/minicart.js"></script>
+        <style>
+            .popup-cart {
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                width: 300px;
+                background-color: white;
+                border: 1px solid #ccc;
+                padding: 10px;
+                z-index: 1000;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                display: none;
+            }
+        </style>
     </body>
 </html>

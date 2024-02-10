@@ -6,9 +6,10 @@ function updateCart(prodID,upType)
         url: '/cart', // Replace with your API endpoint
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({ productID: prodID, updateType: upType }),
+        data: JSON.stringify({ productID: prodID, updateType: upType, tempUserSession: 'toshu' }),
         success: function(data) {
           console.log("Success");
+          triggerMiniCart();
         },
         error: function(xhr, status, error) {
           console.log("Failed");
@@ -16,35 +17,35 @@ function updateCart(prodID,upType)
       });
 }
 
-var delete_cookie = function(cookiename) {
-    console.log("Tetsing deleteing cookie");
-    document.cookie = cookiename + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-};
+// var delete_cookie = function(cookiename) {
+//     console.log("Tetsing deleteing cookie");
+//     document.cookie = cookiename + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+// };
 
-function removeProductFromCart(prodID)
-{
+// function removeProductFromCart(prodID)
+// {
 
-    if(getCookie("cart_prodid_"+prodID))
-    {
-        let currentVal = parseInt(getCookie("cart_prodid_"+prodID));
-        if(currentVal!=0 && currentVal>1)
-        {
-        console.log("Cookie existed with value = "+currentVal);
-        document.cookie = "cart_prodid_"+prodID+"="+(currentVal-1);
-        console.log("Cookie decremented with new value = "+(currentVal-1));
-        }
-        else if(currentVal == 1){
-            delete_cookie('cart_prodid_'+prodID);
-            console.log("No qty for the product in cart to remove!");
-        }
-        else{
-            console.log("No Cookie for product was ever created");
-        }
-    }
-    else{
-        console.log("No Cookie for product was ever created");
-    }
-}
+//     if(getCookie("cart_prodid_"+prodID))
+//     {
+//         let currentVal = parseInt(getCookie("cart_prodid_"+prodID));
+//         if(currentVal!=0 && currentVal>1)
+//         {
+//         console.log("Cookie existed with value = "+currentVal);
+//         document.cookie = "cart_prodid_"+prodID+"="+(currentVal-1);
+//         console.log("Cookie decremented with new value = "+(currentVal-1));
+//         }
+//         else if(currentVal == 1){
+//             delete_cookie('cart_prodid_'+prodID);
+//             console.log("No qty for the product in cart to remove!");
+//         }
+//         else{
+//             console.log("No Cookie for product was ever created");
+//         }
+//     }
+//     else{
+//         console.log("No Cookie for product was ever created");
+//     }
+// }
 
  function updateCartPagePrices(price,updateType){
     if(updateType=="increment"){
