@@ -62,7 +62,7 @@ function updateCart(prodID,upType)
 
 function fetchCartDetailsFromServer(){
  $.ajax({
-    url: "/cart",
+    url: "/cart/toshu",
     type: 'GET',
     success: function(data){
         const fetchData = async () => {
