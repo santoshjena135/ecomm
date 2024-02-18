@@ -23,7 +23,7 @@ const headerElement = document.querySelector(".globalheader");
                                 <a class="nav-link" href="productlisting.html?category=electronics">Electronics</a>
                                 </li>
                                 <li class="nav-item">
-                                <a class="nav-link" href="mycart.html">Cart</a>
+                                <a class="nav-link" href="http://localhost:5050/mycart.html">Cart</a>
                                 </li>
                                 <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

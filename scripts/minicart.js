@@ -12,7 +12,7 @@ function updateMiniCart(){
         miniCart.innerHTML = '';
         $.ajax({
             type: "GET",
-            url: "/cart/toshu", // toshu will be replaced dynamically with unique cookie value
+            url: "/cart", 
             success: async function (data) {
                 const fetchData = async () => {
                 console.log(data);

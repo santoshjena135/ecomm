@@ -6,7 +6,7 @@ function updateCart(prodID,upType)
         url: '/cart', // Replace with your API endpoint
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({ productID: prodID, updateType: upType, tempUserSession: 'toshu' }),
+        data: JSON.stringify({ productID: prodID, updateType: upType }),
         success: function(data) {
           console.log("Success");
           triggerMiniCart();
@@ -16,36 +16,6 @@ function updateCart(prodID,upType)
         }
       });
 }
-
-// var delete_cookie = function(cookiename) {
-//     console.log("Tetsing deleteing cookie");
-//     document.cookie = cookiename + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-// };
-
-// function removeProductFromCart(prodID)
-// {
-
-//     if(getCookie("cart_prodid_"+prodID))
-//     {
-//         let currentVal = parseInt(getCookie("cart_prodid_"+prodID));
-//         if(currentVal!=0 && currentVal>1)
-//         {
-//         console.log("Cookie existed with value = "+currentVal);
-//         document.cookie = "cart_prodid_"+prodID+"="+(currentVal-1);
-//         console.log("Cookie decremented with new value = "+(currentVal-1));
-//         }
-//         else if(currentVal == 1){
-//             delete_cookie('cart_prodid_'+prodID);
-//             console.log("No qty for the product in cart to remove!");
-//         }
-//         else{
-//             console.log("No Cookie for product was ever created");
-//         }
-//     }
-//     else{
-//         console.log("No Cookie for product was ever created");
-//     }
-// }
 
  function updateCartPagePrices(price,updateType){
     if(updateType=="increment"){
@@ -62,7 +32,7 @@ function updateCart(prodID,upType)
 
 function fetchCartDetailsFromServer(){
  $.ajax({
-    url: "/cart/toshu",
+    url: "/cart", // sends user_id in req.cookies for fetching cart details specific to user
     type: 'GET',
     success: function(data){
         const fetchData = async () => {
@@ -73,12 +43,9 @@ function fetchCartDetailsFromServer(){
         console.log(total_cart_value);
         const cartProdList = document.querySelector(".cartitemslist");
         for (const [prodID,qty] of arr){
-            //const val = array[i].value;
-            //console.log(`ID: ${prodID} Count: ${qty}`);
             total_items_count++; 
             const response = await fetch(`https://fakestoreapi.com/products/${prodID}`);
             var proddata = await response.json();
-
             total_cart_value += (parseFloat(proddata.price)*qty);
             let cartProdElementStr = `
             <div class="row mb-4 d-flex justify-content-between align-items-center">

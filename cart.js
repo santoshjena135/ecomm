@@ -1,4 +1,6 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
+const uuid = require('uuid');
 const bodyParser = require("body-parser");
 const PORT = 3000;
 const app = express();
@@ -6,9 +8,12 @@ const app = express();
 const userCarts ={}; // This will temporarily store 'prodId' : 'count' against a 'userid' till server restarts/crashes
 
 app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-app.get("/cart/:user", (req, res) => {
-  const user = req.params.user;
+app.get("/cart", (req, res) => {
+  const user = req.cookies.user_id;
+  //const user = req.cookies.user_id;
   if(user === "all") // fetches all user carts, only for testing purpose
   {
     return res.send(userCarts);
@@ -19,10 +24,14 @@ app.get("/cart/:user", (req, res) => {
   }
 });
 
+app.get("/cart/all", (req, res) => {
+  res.send(userCarts); // send all users cart details // TESTING ONLY
+});
+
 app.post("/cart", (req, res) => {
   var productId = req.body.productID;
   var updateType = req.body.updateType;
-  var user = req.body.tempUserSession; 
+  var user = req.cookies.user_id;
 
   if (!productId || !updateType || !user) {
     return res.status(400).send("Missing required parameters");
