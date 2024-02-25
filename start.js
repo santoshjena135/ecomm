@@ -15,3 +15,11 @@ exec('npx nodemon cart.js', (err, stdout, stderr) => {
     }
     console.log(stdout);
 });
+
+exec('npx nodemon dbroutes.js', (err, stdout, stderr) => {
+    if (err) {
+        console.error(`Error starting DB-Routes Service 'dbroutes.js': ${err}`);
+        return;
+    }
+    console.log(stdout);
+});

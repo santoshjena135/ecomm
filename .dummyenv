@@ -1,0 +1,3 @@
+# MongoDB username and password
+MONGODB_USERNAME=your_mongoDB_username
+MONGODB_PASSWORD=your_mongoDB_password
