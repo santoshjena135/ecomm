@@ -71,4 +71,33 @@ app.get("/products/:id", (req, res) => {
   run().catch(console.error);
 });
 
+app.get("/products/category/:category", (req, res) => {
+  const category = req.params.category;
+  async function run() {
+    try {
+      await client.connect();
+      console.log("Connected to MongoDB!");
+
+      const database = client.db("ecomm"); 
+      const collection = database.collection("products");
+      
+      const product = await collection.find({ category: String(category) }).sort({id:1}).toArray();
+      if(product){
+        console.log("Product_Details: ",product);
+        return res.send(product);
+      }
+      else{
+        return res.status(404).send("Product with category -> "+category+" not found in MongoDB");
+      }
+
+    } finally {
+      await client.close();
+      console.log("MongoDB connection closed.");
+    }
+  }
+
+  run().catch(console.error);
+});
+
+
 app.listen(PORT, () => console.log(`DB-Routes service running on port ${PORT} 🔥`));
