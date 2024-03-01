@@ -22,7 +22,7 @@ app.use(express.static('scripts'));
 app.use(express.static('styles'));
 app.use(express.static(__dirname)); //can server static html files on same level as this index.js ex: index.html, cart.html on port 5050
 app.use('/cart', createProxyMiddleware({ target: 'http://localhost:3000', changeOrigin: true }));
-
+app.use('/addProduct', createProxyMiddleware({ target: 'http://localhost:4000', changeOrigin: true }));
 
 //<------------ Routes List Starts ------------->
 

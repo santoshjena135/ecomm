@@ -1,6 +1,8 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const app = express();
 const PORT = 4000;
+app.use(bodyParser.json());
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config();
 const username = process.env.MONGODB_USERNAME;
@@ -82,7 +84,7 @@ app.get("/products/category/:category", (req, res) => {
       const collection = database.collection("products");
       
       const product = await collection.find({ category: String(category) }).sort({id:1}).toArray();
-      if(product){
+      if(product && product.length!=0){
         console.log("Product_Details: ",product);
         return res.send(product);
       }
@@ -96,6 +98,33 @@ app.get("/products/category/:category", (req, res) => {
     }
   }
 
+  run().catch(console.error);
+});
+
+app.post("/addProduct", (req, res) => {
+  const product = req.body;
+  async function run() {
+    try {
+      await client.connect();
+      console.log("Connected to MongoDB!");
+
+      const database = client.db("ecomm"); 
+      const collection = database.collection("products");
+      const result = await collection.insertOne(product);
+      
+      console.log("Insertion result:", result);
+      console.log(`${result.insertedCount} document inserted into DB`);
+      if(result.acknowledged){
+        return res.status(200).json([{"message":"insert success"}]);
+      }
+      else{
+        return res.status(500).send("Error adding product!");
+      }
+    } finally {
+      await client.close();
+      console.log("MongoDB connection closed.");
+    }
+  }
   run().catch(console.error);
 });
 
