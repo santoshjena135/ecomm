@@ -1,6 +1,24 @@
 const express = require("express");
+const multer = require('multer');
+const path = require('path');
 const bodyParser = require("body-parser");
 const app = express();
+
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, 'uploads/'); // /uploads directory needs to be present before any file uploads
+  },
+  filename: function(req, file, cb) {
+    // Generate a unique name for the file
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    // Get the file extension
+    const ext = path.extname(file.originalname);
+    // Set the filename to be unique and keep the original file extension
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
+});
+const upload = multer({ storage: storage });
+
 const PORT = 4000;
 app.use(bodyParser.json());
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -101,8 +119,23 @@ app.get("/products/category/:category", (req, res) => {
   run().catch(console.error);
 });
 
-app.post("/addProduct", (req, res) => {
-  const product = req.body;
+app.post("/addProduct", upload.single('image'), (req, res) => {
+  const formProduct = req.body;
+  const imageFilepath = req.file.path;
+  const productJSON = {
+    "id": parseInt(formProduct.id),
+    "title": formProduct.title,
+    "price": parseFloat(formProduct.price),
+    "description": formProduct.description,
+    "category": formProduct.category,
+    "image": "/"+imageFilepath,
+    "rating": {
+                "rate": parseFloat(formProduct.rate),
+                "count": parseInt(formProduct.count)
+    }
+
+  };
+  console.log("Inserting Product JSON",productJSON);
   async function run() {
     try {
       await client.connect();
@@ -110,7 +143,7 @@ app.post("/addProduct", (req, res) => {
 
       const database = client.db("ecomm"); 
       const collection = database.collection("products");
-      const result = await collection.insertOne(product);
+      const result = await collection.insertOne(productJSON);
       
       console.log("Insertion result:", result);
       console.log(`${result.insertedCount} document inserted into DB`);

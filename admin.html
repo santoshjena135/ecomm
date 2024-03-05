@@ -47,8 +47,8 @@
                 <input type="text" class="form-control" id="category" name="category">
               </div>
               <div class="form-group">
-                <label for="image">Image URL:</label>
-                <input type="text" class="form-control" id="image" name="image">
+                <label for="image">Image:</label>
+                <input type="file" class="form-control-file" id="image" name="image">
               </div>
               <div class="form-group">
                 <label for="rate">Rating Rate:</label>
@@ -77,27 +77,22 @@ $(document).ready(function() {
   $('#addProductForm').submit(function(event) {
     event.preventDefault();
 
-    var formData = {
-      id: parseInt($('#id').val()),
-      title: $('#title').val(),
-      price: parseFloat($('#price').val()),
-      description: $('#description').val(),
-      category: $('#category').val(),
-      image: $('#image').val(),
-      rating: {
-        rate: parseFloat($('#rate').val()),
-        count: parseInt($('#count').val())
-      }
-    };
-
-    var jsonData = JSON.stringify(formData);
+    var formData = new FormData();
+    formData.append('id', parseInt($('#id').val()));
+    formData.append('title', $('#title').val());
+    formData.append('price', parseFloat($('#price').val()));
+    formData.append('description', $('#description').val());
+    formData.append('category', $('#category').val());
+    formData.append('image', $('#image')[0].files[0]); // Append file
+    formData.append('rate', parseFloat($('#rate').val()));
+    formData.append('count', parseInt($('#count').val()));
 
     $.ajax({
       type: 'POST',
       url: '/addProduct',
-      data: jsonData,
-      contentType: 'application/json',
-      dataType: 'json',
+      data: formData,
+      contentType: false, // Not setting contentType
+      processData: false, // Not processing data
       success: function(response) {
         console.log(response);
          },
