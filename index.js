@@ -1,4 +1,5 @@
 const express = require('express');
+const https = require('https');
 const cookieParser = require('cookie-parser');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const axios = require('axios');
@@ -23,13 +24,19 @@ app.use(express.static('styles'));
 app.use(express.static(__dirname)); //can server static html files on same level as this index.js ex: index.html, cart.html on port 5050
 app.use('/cart', createProxyMiddleware({ target: 'http://localhost:3000', changeOrigin: true }));
 app.use('/addProduct', createProxyMiddleware({ target: 'http://localhost:4000', changeOrigin: true }));
+app.use('/products/:id', createProxyMiddleware({ target: 'http://localhost:4000',
+                                                 changeOrigin: true ,
+                                                 pathRewrite: (path, req) => {
+                                                    const productId = req.params.id;
+                                                    return `/products/${productId}`;
+                                                  }}));
 
 //<------------ Routes List Starts ------------->
 
 app.get('/product/:id', async (req, res) => {
     const productId = parseInt(req.params.id);
     try{
-        const response = await axios.get(`https://fakestoreapi.com/products/${productId}`);
+        const response = await axios.get(`http://localhost:4000/products/${productId}`);
         if (response.data && typeof response.data === 'object') {
             const product = response.data;
                 if (product) {

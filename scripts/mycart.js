@@ -44,7 +44,7 @@ function fetchCartDetailsFromServer(){
         const cartProdList = document.querySelector(".cartitemslist");
         for (const [prodID,qty] of arr){
             total_items_count++; 
-            const response = await fetch(`https://fakestoreapi.com/products/${prodID}`);
+            const response = await fetch(`/products/${prodID}`);
             var proddata = await response.json();
             total_cart_value += (parseFloat(proddata.price)*qty);
             let cartProdElementStr = `

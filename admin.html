@@ -8,12 +8,17 @@
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-  <!-- Button to trigger modal -->
+  <!-- Button to trigger add product modal -->
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addProductModal">
     Add Product
   </button>
 
-  <!-- Modal -->
+    <!-- Button to trigger add category modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addCategoryModal">
+      Add Category
+    </button>
+
+  <!-- Add Product Modal -->
   <div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -44,8 +49,10 @@
               </div>
               <div class="form-group">
                 <label for="category">Category:</label>
-                <input type="text" class="form-control" id="category" name="category">
-              </div>
+                <select class="form-control" id="category" name="category">
+
+                  </select>
+            </div>
               <div class="form-group">
                 <label for="image">Image:</label>
                 <input type="file" class="form-control-file" id="image" name="image">
@@ -65,6 +72,46 @@
     </div>
   </div>
 
+  <!-- Add Category Modal -->
+  <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add Category</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Form -->
+          <form id="addCategoryForm">
+            <div class="form-group">
+              <label for="id">ID:</label>
+              <input type="number" class="form-control" id="catId" name="catId">
+            </div>
+            <div class="form-group">
+                <label for="category">Category Name :</label>
+                <input type="text" class="form-control" id="categoryName" name="categoryName">
+              </div>
+              <div class="form-group">
+                <label for="displayName">Display Name in website :</label>
+                <input type="text" class="form-control" id="displayName" name="displayName">
+              </div>
+            <div class="form-group">
+                <label for="active">Status:</label>
+                <select class="form-control" id="active" name="active">
+                  <option value="false">Keep Inactive</option>
+                  <option value="true">Activate</option>
+                  </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Bootstrap JS (optional) -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
@@ -74,6 +121,24 @@
 
   <script>
 $(document).ready(function() {
+
+  //get categories and populate them in dropdown
+  $.ajax({
+      type: 'GET',
+      url: 'http://localhost:4000/categories/all',
+      success: function(categories) {
+        const ele = document.getElementById('category');
+        ele.innerHTML = '';
+        for(i in categories){
+          const opt = `<option value="${categories[i]}">${categories[i].charAt(0).toUpperCase() + categories[i].slice(1)}</option>`;
+          ele.innerHTML += opt;
+        }
+        console.log("Categories Populated from /categories!");
+         },
+      error: function(xhr, status, error) {
+        console.error(xhr.responseText);}
+    });
+
   $('#addProductForm').submit(function(event) {
     event.preventDefault();
 
@@ -100,7 +165,33 @@ $(document).ready(function() {
         console.error(xhr.responseText);}
     });
   });
+
+  $('#addCategoryForm').submit(function(event) {
+    event.preventDefault();
+
+    var formData = {
+        id: parseInt($('#catId').val()),
+        categoryName: $('#categoryName').val(),
+        displayName: $('#displayName').val(),
+        active: $('#active').val() === 'true'
+    };
+
+    $.ajax({
+      type: 'POST',
+      url: 'http://localhost:4000/addCategory',
+      data: JSON.stringify(formData),
+      contentType: 'application/json',
+      success: function(response) {
+        console.log(response);
+        alert(JSON.stringify(response));
+         },
+      error: function(xhr, status, error) {
+        console.error(xhr.responseText);}
+    });
+  });
 });
+
+
 
   </script>
 </body>

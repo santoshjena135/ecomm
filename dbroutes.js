@@ -21,6 +21,7 @@ const upload = multer({ storage: storage });
 
 const PORT = 4000;
 app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config();
 const username = process.env.MONGODB_USERNAME;
@@ -91,6 +92,7 @@ app.get("/products/:id", (req, res) => {
   run().catch(console.error);
 });
 
+//to get products by category
 app.get("/products/category/:category", (req, res) => {
   const category = req.params.category;
   async function run() {
@@ -108,6 +110,49 @@ app.get("/products/category/:category", (req, res) => {
       }
       else{
         return res.status(404).send("Product with category -> "+category+" not found in MongoDB");
+      }
+
+    } finally {
+      await client.close();
+      console.log("MongoDB connection closed.");
+    }
+  }
+
+  run().catch(console.error);
+});
+
+//to get all/active/inactive categories
+app.get("/categories/:type", (req, res) => {
+  const type = req.params.type;
+  async function run() {
+    try {
+      await client.connect();
+      console.log("Connected to MongoDB!");
+
+      const database = client.db("ecomm"); 
+      const collection = database.collection("categories");
+      
+      const categories = await collection.find({}).toArray();
+      const allCategoryNames = categories.map(category => category.categoryName);
+      const activeCategoryNames = categories.filter(category => category.active).map(category => category.categoryName);
+      const inactiveCategoryNames = categories.filter(category => !category.active).map(category => category.categoryName);
+      if(categories){
+        console.log("All_Categories_Details: ",categories);
+        if(type === "active"){
+          return res.send(activeCategoryNames);
+        }
+        else if(type === "inactive"){
+          return res.send(inactiveCategoryNames)
+        }
+        else if(type === "all"){
+          return res.send(allCategoryNames);
+        }
+        else{
+          return res.send("Bad Parameter!")
+        }
+      }
+      else{
+        return res.status(404).send("No Categories in MongoDB");
       }
 
     } finally {
@@ -153,6 +198,47 @@ app.post("/addProduct", upload.single('image'), (req, res) => {
       else{
         return res.status(500).send("Error adding product!");
       }
+    } finally {
+      await client.close();
+      console.log("MongoDB connection closed.");
+    }
+  }
+  run().catch(console.error);
+});
+
+app.post("/addCategory", (req, res) => {
+  const formProduct = req.body;
+  const categoryJSON = {
+    "id": parseInt(formProduct.id),
+    "categoryName": formProduct.categoryName,
+    "displayName": formProduct.displayName,
+    "active": formProduct.active
+  };
+  console.log("Inserting Product JSON",categoryJSON);
+  async function run() {
+    try {
+      await client.connect();
+      console.log("Connected to MongoDB!");
+
+      const database = client.db("ecomm"); 
+      const collection = database.collection("categories");
+
+      const checkExisting = await collection.findOne({'categoryName':categoryJSON.categoryName});
+      console.log("checkExisting",checkExisting);
+      if(checkExisting){
+        return res.json([{"message":"CategoryName already exists!"}]);
+      }
+      else{
+        const result = await collection.insertOne(categoryJSON);
+        console.log("Insertion result:", result);
+        console.log(`${result.insertedCount} document inserted into DB`);
+        if(result.acknowledged){
+          return res.status(200).json([{"message":"insert success"}]);
+        }
+        else{
+          return res.status(500).send("Error adding product!");
+        }
+    }
     } finally {
       await client.close();
       console.log("MongoDB connection closed.");

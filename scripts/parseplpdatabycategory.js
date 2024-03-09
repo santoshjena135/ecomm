@@ -1,6 +1,7 @@
 async function populateProductsAPIbyCategory(categoryType)
 {
-    const response = await fetch(`https://fakestoreapi.com/products/category/${categoryType}`);
+    //const response = await fetch(`https://fakestoreapi.com/products/category/${categoryType}`);
+    const response = await fetch(`http://localhost:4000/products/category/${categoryType}`);
     var data = await response.json();
     const prodList = document.querySelector(".row");
 
