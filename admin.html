@@ -130,7 +130,7 @@ $(document).ready(function() {
         const ele = document.getElementById('category');
         ele.innerHTML = '';
         for(i in categories){
-          const opt = `<option value="${categories[i]}">${categories[i].charAt(0).toUpperCase() + categories[i].slice(1)}</option>`;
+          const opt = `<option value="${categories[i].categoryName}">${categories[i].displayName}</option>`;
           ele.innerHTML += opt;
         }
         console.log("Categories Populated from /categories!");

@@ -132,10 +132,15 @@ app.get("/categories/:type", (req, res) => {
       const database = client.db("ecomm"); 
       const collection = database.collection("categories");
       
+      const formatCategory = (category) => ({
+          categoryName: category.categoryName,
+          displayName: category.displayName
+      });
       const categories = await collection.find({}).toArray();
-      const allCategoryNames = categories.map(category => category.categoryName);
-      const activeCategoryNames = categories.filter(category => category.active).map(category => category.categoryName);
-      const inactiveCategoryNames = categories.filter(category => !category.active).map(category => category.categoryName);
+
+      const allCategoryNames = categories.map(formatCategory);
+      const activeCategoryNames = categories.filter(category => category.active).map(formatCategory);
+      const inactiveCategoryNames = categories.filter(category => !category.active).map(formatCategory);
       if(categories){
         console.log("All_Categories_Details: ",categories);
         if(type === "active"){

@@ -1,5 +1,16 @@
-const headerElement = document.querySelector(".globalheader");
-         var str =   `<nav class="navbar navbar-expand-lg bg-body-tertiary">
+$.ajax({
+    type: 'GET',
+    url: '/categories/active',
+    success: function(categories) {
+        let activeCategories = '';
+        for(i in categories){
+            const activeCategoryEle = `<li class="nav-item">
+                            <a class="nav-link" href="productlisting.html?category=${categories[i].categoryName}">${categories[i].displayName}</a>
+                        </li>`;
+            activeCategories += activeCategoryEle;
+        }
+        const headerElement = document.querySelector(".globalheader");
+        var str =   `<nav class="navbar navbar-expand-lg bg-body-tertiary">
                             <div class="container-fluid">
                             <a class="navbar-brand" href="/index.html">myCommerce</a>
                             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -9,19 +20,8 @@ const headerElement = document.querySelector(".globalheader");
                             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                                 <li class="nav-item">
                                 <a class="nav-link active" aria-current="page" href="/index.html">Home</a>
-                                </li>
-                                <li class="nav-item">
-                                <a class="nav-link" href="productlisting.html?category=men's clothing">Men</a>
-                                </li>
-                                <li class="nav-item">
-                                <a class="nav-link" href="productlisting.html?category=women's clothing">Women</a>
-                                </li>
-                                <li class="nav-item">
-                                <a class="nav-link" href="productlisting.html?category=jewelery">Jewelery</a>
-                                </li>
-                                <li class="nav-item">
-                                <a class="nav-link" href="productlisting.html?category=electronics">Electronics</a>
-                                </li>
+                                </li>`+ activeCategories
+                                        +`
                                 <li class="nav-item">
                                 <a class="nav-link" href="http://localhost:5050/mycart.html">Cart</a>
                                 </li>
@@ -48,4 +48,11 @@ const headerElement = document.querySelector(".globalheader");
                         </div>
                         </nav>
                     `;
-                     headerElement.innerHTML = str;
+        headerElement.innerHTML = str;
+        console.log("Categories Populated from /categories/active");
+       },
+    error: function(xhr, status, error) {
+      console.error(xhr.responseText);}
+  }); 
+
+
