@@ -27,16 +27,17 @@ require('dotenv').config();
 const username = process.env.MONGODB_USERNAME;
 const password = process.env.MONGODB_PASSWORD;
 const uri = `mongodb+srv://${username}:${password}@cluster0.kedgoiw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-const client = new MongoClient(uri, {
+const clientOptions = {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
   }
-});
+};
 
 //to get all products
 app.get("/products", (req, res) => {
+  const client = new MongoClient(uri,clientOptions);
     async function run() {
       try {
         await client.connect();
@@ -66,6 +67,7 @@ app.get("/products", (req, res) => {
 //to get product by id
 app.get("/products/:id", (req, res) => {
   const prodid = req.params.id;
+  const client = new MongoClient(uri,clientOptions);
   async function run() {
     try {
       await client.connect();
@@ -95,6 +97,7 @@ app.get("/products/:id", (req, res) => {
 //to get products by category
 app.get("/products/category/:category", (req, res) => {
   const category = req.params.category;
+  const client = new MongoClient(uri,clientOptions);
   async function run() {
     try {
       await client.connect();
@@ -124,6 +127,7 @@ app.get("/products/category/:category", (req, res) => {
 //to get all/active/inactive categories
 app.get("/categories/:type", (req, res) => {
   const type = req.params.type;
+  const client = new MongoClient(uri,clientOptions);
   async function run() {
     try {
       await client.connect();
@@ -185,7 +189,7 @@ app.post("/addProduct", upload.single('image'), (req, res) => {
     }
 
   };
-  console.log("Inserting Product JSON",productJSON);
+  const client = new MongoClient(uri,clientOptions);
   async function run() {
     try {
       await client.connect();
@@ -213,6 +217,7 @@ app.post("/addProduct", upload.single('image'), (req, res) => {
 
 app.post("/addCategory", (req, res) => {
   const formProduct = req.body;
+  const client = new MongoClient(uri,clientOptions);
   const categoryJSON = {
     "id": parseInt(formProduct.id),
     "categoryName": formProduct.categoryName,
