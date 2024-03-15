@@ -8,8 +8,9 @@
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+
   <!-- Button to trigger add product modal -->
-  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addProductModal">
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addProductModal" id="addProductBtn">
     Add Product
   </button>
 
@@ -113,19 +114,17 @@
   </div>
 
   <!-- Bootstrap JS (optional) -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <!-- jQuery for AJAX -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
   <script>
 $(document).ready(function() {
 
   //get categories and populate them in dropdown
-  $.ajax({
+  $('#addProductBtn').on('click', function() {
+    $.ajax({
       type: 'GET',
-      url: 'http://localhost:4000/categories/all',
+      url: '/categories/all',
       success: function(categories) {
         const ele = document.getElementById('category');
         ele.innerHTML = '';
@@ -138,7 +137,8 @@ $(document).ready(function() {
       error: function(xhr, status, error) {
         console.error(xhr.responseText);}
     });
-
+  });
+ 
   $('#addProductForm').submit(function(event) {
     event.preventDefault();
 
@@ -160,6 +160,8 @@ $(document).ready(function() {
       processData: false, // Not processing data
       success: function(response) {
         console.log(response);
+        $('#addProductModal').modal('hide');
+        $('#addProductForm')[0].reset();
          },
       error: function(xhr, status, error) {
         console.error(xhr.responseText);}

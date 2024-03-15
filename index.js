@@ -30,7 +30,12 @@ app.use('/products/:id', createProxyMiddleware({ target: 'http://localhost:4000'
                                                     const productId = req.params.id;
                                                     return `/products/${productId}`;
                                                   }}));
-app.use('/categories/active', createProxyMiddleware({ target: 'http://localhost:4000', changeOrigin: true }));
+app.use('/categories/:param', createProxyMiddleware({ target: 'http://localhost:4000',
+                                                     changeOrigin: true,
+                                                    pathRewrite: (path,req)=>{
+                                                        const param = req.params.param;
+                                                        return `/categories/${param}`;
+                                                    }}));
 
 
 //<------------ Routes List Starts ------------->

@@ -19,7 +19,7 @@ function updateMiniCart(){
                 const arr = Object.entries(data);
                 
                 for (const [prodID,qty] of arr){
-                    const response = await fetch(`https://fakestoreapi.com/products/${prodID}`);
+                    const response = await fetch(`/products/${prodID}`);
                     var proddata = await response.json();
                     let miniCartProdElementStr = `<div>${proddata.title} - *${qty}</div><br>`;
                     miniCart.innerHTML += miniCartProdElementStr;
