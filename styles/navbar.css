@@ -11,3 +11,9 @@
     float: right;
     padding: 10px;
 }
+.active-category{
+    border-bottom: 3px solid #007bff;
+    pointer-events: none;
+    text-decoration: none; /* Remove underline */
+    cursor: default; /* Change cursor style */
+}

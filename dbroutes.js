@@ -173,6 +173,43 @@ app.get("/categories/:type", (req, res) => {
   run().catch(console.error);
 });
 
+//to get products by search term
+app.get("/search/:searchTerm", (req, res) => {
+  const searchTerm = req.params.searchTerm;
+  const regexPattern = new RegExp("\\b" + searchTerm + "\\b", 'i');
+  const client = new MongoClient(uri,clientOptions);
+  async function run() {
+    try {
+      await client.connect();
+      console.log("Connected to MongoDB!");
+
+      const database = client.db("ecomm"); 
+      const collection = database.collection("products");
+      
+      const product = await collection.find({
+        $or: [
+          { title: { $regex: regexPattern } },
+          { description: { $regex: regexPattern } }
+        ]
+      }).toArray();
+
+      if(product && product.length!=0){
+        console.log("Search_Product_Details: ",product);
+        return res.send(product);
+      }
+      else{
+        return res.status(404).send("Products with searchTerm -> "+searchTerm+" not found in MongoDB");
+      }
+
+    } finally {
+      await client.close();
+      console.log("MongoDB connection closed.");
+    }
+  }
+
+  run().catch(console.error);
+});
+
 app.post("/addProduct", upload.single('image'), (req, res) => {
   const formProduct = req.body;
   const imageFilepath = req.file.path;

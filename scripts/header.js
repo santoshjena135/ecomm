@@ -3,9 +3,14 @@ $.ajax({
     url: '/categories/active',
     success: function(categories) {
         let activeCategories = '';
+        const isProductListingPage = (window.location.href.includes('/productlisting.html'))?true:false;
+        if(isProductListingPage)
+        {
+            var currentCategory = window.location.href.split('=')[1];
+        }
         for(i in categories){
             const activeCategoryEle = `<li class="nav-item">
-                            <a class="nav-link" href="productlisting.html?category=${categories[i].categoryName}">${categories[i].displayName}</a>
+                            <a class="nav-link ${(isProductListingPage && (decodeURIComponent(currentCategory) == categories[i].categoryName))? 'active-category':''}" href="productlisting.html?category=${categories[i].categoryName}">${categories[i].displayName}</a>
                         </li>`;
             activeCategories += activeCategoryEle;
         }
@@ -41,15 +46,24 @@ $.ajax({
                                 </li>
                             </ul>
                             <form class="d-flex" role="search">
-                                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                                <button class="btn btn-outline-success" type="submit">Search</button>
+                                <input id="searchbox" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                             </form>
+                            <button id="searchbtn"class="btn btn-outline-success">Search</button>
                             </div>
                         </div>
                         </nav>
                     `;
         headerElement.innerHTML = str;
         console.log("Categories Populated from /categories/active");
+        $('#searchbtn').on('click',()=>{
+            const searchTerm = $('#searchbox').val();
+            if(searchTerm && searchTerm!=''){
+                window.location.href = '/search.html?q='+searchTerm;
+            }
+            else{
+                console.log("Enter a valid searchTerm!");
+            }
+        });
        },
     error: function(xhr, status, error) {
       console.error(xhr.responseText);}
