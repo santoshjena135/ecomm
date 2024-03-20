@@ -40,7 +40,8 @@ app.use('/categories/:param', createProxyMiddleware({ target: 'http://localhost:
 
 //<------------ Routes List Starts ------------->
 
-app.get('/product/:id', async (req, res) => {
+app.get('/product.:id.:ptitle', async (req, res) => {
+    //ptitle -> producttitle is only for SEO purposes and no functional use
     const productId = parseInt(req.params.id);
     try{
         const response = await axios.get(`http://localhost:4000/products/${productId}`);

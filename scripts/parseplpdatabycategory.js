@@ -18,7 +18,7 @@ async function populateProductsAPIbyCategory(categoryType)
                                     </div>
                                     <div class="col">
                                         <a href="/productpage.html?prodid=${data[i].id}" class="btn btn-primary">View</a>
-                                        <a href="/product/${data[i].id}" class="btn btn-primary">SSR-View</a>
+                                        <a href="/product.${data[i].id}.${sanitizeTitle(data[i].title)}" class="btn btn-primary">SSR-View</a>
                                         </div>
                                 </div>
                             </div>
@@ -33,6 +33,16 @@ async function populateProductsAPIbyCategory(categoryType)
 const urlParams = new URLSearchParams(location.search);
 if(urlParams.has('category')){
     var catVal = urlParams.get('category');
+}
+
+function sanitizeTitle(title) {
+    title = title.toLowerCase();
+    // Remove special characters and replace spaces with hyphens
+    title = title.replace(/[^\w\s-]/g, '') // Remove special characters except hyphen
+                 .replace(/\s+/g, '-')       // Replace spaces with hyphens
+                 .replace(/--+/g, '-')       // Replace consecutive hyphens with single hyphen
+                 .trim();                    // Trim leading/trailing spaces
+    return title;
 }
 
 populateProductsAPIbyCategory(catVal);
