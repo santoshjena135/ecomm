@@ -2,7 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const uuid = require('uuid');
 const bodyParser = require("body-parser");
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 const userCarts ={}; // This will temporarily store 'prodId' : 'count' against a 'userid' till server restarts/crashes
