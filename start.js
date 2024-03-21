@@ -1,6 +1,6 @@
 const { exec } = require('child_process');
 
-exec('npx nodemon index.js', (err, stdout, stderr) => {
+exec('npx nodemon app.js', (err, stdout, stderr) => {
     if (err) {
         console.error(`Error starting Server 'index.js' : ${err}`);
         return;
