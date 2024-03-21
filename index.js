@@ -5,7 +5,7 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const axios = require('axios');
 const uuid = require('uuid');
 const app = express();
-const port = 5050;
+const port = process.env.PORT || 5050;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
