@@ -95,7 +95,7 @@ app.get("/products/:id", (req, res) => {
 });
 
 //to get products by category
-app.get("/products/category/:category", (req, res) => {
+app.get("/category/:category", (req, res) => {
   const category = req.params.category;
   const client = new MongoClient(uri,clientOptions);
   async function run() {

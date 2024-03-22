@@ -1,7 +1,7 @@
 async function populateProductsAPIbyCategory(categoryType)
 {
-    //const response = await fetch(`https://fakestoreapi.com/products/category/${categoryType}`);
-    const response = await fetch(`http://localhost:4000/products/category/${categoryType}`);
+    const currentHost = window.location.protocol+'//'+window.location.host;
+    const response = await fetch(`${currentHost}/category/${categoryType}`);
     var data = await response.json();
     const prodList = document.querySelector(".row");
 
@@ -17,7 +17,7 @@ async function populateProductsAPIbyCategory(categoryType)
                                         <p class="card-text">${data[i].price} USD</p>
                                     </div>
                                     <div class="col">
-                                        <a href="/productpage.html?prodid=${data[i].id}" class="btn btn-primary">View</a>
+                                        <!-- <a href="/productpage.html?prodid=${data[i].id}" class="btn btn-primary">View</a> -->
                                         <a href="/product.${data[i].id}.${sanitizeTitle(data[i].title)}" class="btn btn-primary">SSR-View</a>
                                         </div>
                                 </div>

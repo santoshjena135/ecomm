@@ -6,6 +6,8 @@ const axios = require('axios');
 const uuid = require('uuid');
 const app = express();
 const port = process.env.PORT || 5050;
+const db_service_url = process.env.DB_SERVICE_URL || 'http://localhost:4000';
+const cart_service_url = process.env.CART_SERVICE_URL || 'http://localhost:3000';
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -22,20 +24,32 @@ app.set('view engine', 'ejs');
 app.use(express.static('scripts'));
 app.use(express.static('styles'));
 app.use(express.static(__dirname)); //can server static html files on same level as this index.js ex: index.html, cart.html on port 5050
-app.use('/cart', createProxyMiddleware({ target: 'http://localhost:3000', changeOrigin: true }));
-app.use('/addProduct', createProxyMiddleware({ target: 'http://localhost:4000', changeOrigin: true }));
-app.use('/products/:id', createProxyMiddleware({ target: 'http://localhost:4000',
+app.use('/cart', createProxyMiddleware({ target: cart_service_url, changeOrigin: true }));
+app.use('/addProduct', createProxyMiddleware({ target: db_service_url, changeOrigin: true }));
+app.use('/products/:id', createProxyMiddleware({ target: db_service_url,
                                                  changeOrigin: true ,
                                                  pathRewrite: (path, req) => {
                                                     const productId = req.params.id;
                                                     return `/products/${productId}`;
                                                   }}));
-app.use('/categories/:param', createProxyMiddleware({ target: 'http://localhost:4000',
+app.use('/category/:categoryType', createProxyMiddleware({ target: db_service_url,
+                                                    changeOrigin: true ,
+                                                    pathRewrite: (path, req) => {
+                                                       const catType = req.params.categoryType;
+                                                       return `/category/${catType}`;
+                                                     }}));
+app.use('/categories/:param', createProxyMiddleware({ target: db_service_url,
                                                      changeOrigin: true,
                                                     pathRewrite: (path,req)=>{
                                                         const param = req.params.param;
                                                         return `/categories/${param}`;
                                                     }}));
+app.use('/search/:term', createProxyMiddleware({ target: db_service_url,
+                                                        changeOrigin: true,
+                                                       pathRewrite: (path,req)=>{
+                                                           const term = req.params.term;
+                                                           return `/search/${term}`;
+                                                       }}));
 
 
 //<------------ Routes List Starts ------------->
@@ -44,7 +58,7 @@ app.get('/product.:id.:ptitle', async (req, res) => {
     //ptitle -> producttitle is only for SEO purposes and no functional use
     const productId = parseInt(req.params.id);
     try{
-        const response = await axios.get(`http://localhost:4000/products/${productId}`);
+        const response = await axios.get(`${db_service_url}/products/${productId}`);
         if (response.data && typeof response.data === 'object') {
             const product = response.data;
                 if (product) {
