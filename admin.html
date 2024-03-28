@@ -180,7 +180,7 @@ $(document).ready(function() {
 
     $.ajax({
       type: 'POST',
-      url: 'http://localhost:4000/addCategory',
+      url: '/addCategory',
       data: JSON.stringify(formData),
       contentType: 'application/json',
       success: function(response) {
