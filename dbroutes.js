@@ -1,25 +1,13 @@
 const express = require("express");
 const multer = require('multer');
 const path = require('path');
+const AWS = require('aws-sdk');
 const bodyParser = require("body-parser");
 const app = express();
 
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    cb(null, 'uploads/'); // /uploads directory needs to be present before any file uploads
-  },
-  filename: function(req, file, cb) {
-    // Generate a unique name for the file
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    // Get the file extension
-    const ext = path.extname(file.originalname);
-    // Set the filename to be unique and keep the original file extension
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-  }
-});
-const upload = multer({ storage: storage });
+const upload = multer({ storage: multer.memoryStorage() });
 
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -34,6 +22,14 @@ const clientOptions = {
     deprecationErrors: true,
   }
 };
+
+//AWS Confs
+AWS.config.update({
+  accessKeyId: process.env.S3_ACCESS_KEY,
+  secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+  region: process.env.S3_REGION
+});
+const s3 = new AWS.S3();
 
 //to get all products
 app.get("/products", (req, res) => {
@@ -95,7 +91,7 @@ app.get("/products/:id", (req, res) => {
 });
 
 //to get products by category
-app.get("/products/category/:category", (req, res) => {
+app.get("/category/:category", (req, res) => {
   const category = req.params.category;
   const client = new MongoClient(uri,clientOptions);
   async function run() {
@@ -211,45 +207,62 @@ app.get("/search/:searchTerm", (req, res) => {
 });
 
 app.post("/addProduct", upload.single('image'), (req, res) => {
-  const formProduct = req.body;
-  const imageFilepath = req.file.path;
-  const productJSON = {
-    "id": parseInt(formProduct.id),
-    "title": formProduct.title,
-    "price": parseFloat(formProduct.price),
-    "description": formProduct.description,
-    "category": formProduct.category,
-    "image": "/"+imageFilepath,
-    "rating": {
-                "rate": parseFloat(formProduct.rate),
-                "count": parseInt(formProduct.count)
-    }
-
+  const file = req.file;
+  const bucketName = process.env.S3_BUCKET_NAME;
+  const params = {
+    Bucket: bucketName,
+    Key: 'assets/'+(Date.now() + '-' + Math.round(Math.random() * 1E9))+'-'+file.originalname,
+    Body: file.buffer,
+    ContentType: 'image/' + file.originalname.split('.').pop()
   };
-  const client = new MongoClient(uri,clientOptions);
-  async function run() {
-    try {
-      await client.connect();
-      console.log("Connected to MongoDB!");
 
-      const database = client.db("ecomm"); 
-      const collection = database.collection("products");
-      const result = await collection.insertOne(productJSON);
-      
-      console.log("Insertion result:", result);
-      console.log(`${result.insertedCount} document inserted into DB`);
-      if(result.acknowledged){
-        return res.status(200).json([{"message":"insert success"}]);
-      }
-      else{
-        return res.status(500).send("Error adding product!");
-      }
-    } finally {
-      await client.close();
-      console.log("MongoDB connection closed.");
+  s3.upload(params, (err, data) => {
+    if (err) {
+      console.error("Error uploading file:", err);
+      res.status(500).send("Error uploading file to S3");
+    } else {
+      console.log("File uploaded successfully to S3, File location:-", data.Location);
+      console.log("---------------SAVING PRODUCT DETAILS TO MONGO ------------------");
+      const formProduct = req.body;
+      const productJSON = {
+        "id": parseInt(formProduct.id),
+        "title": formProduct.title,
+        "price": parseFloat(formProduct.price),
+        "description": formProduct.description,
+        "category": formProduct.category,
+        "image": data.Location,
+        "rating": {
+                    "rate": parseFloat(formProduct.rate),
+                    "count": parseInt(formProduct.count)
+          }
+        };
+        const client = new MongoClient(uri,clientOptions);
+        async function run() {
+          try {
+            await client.connect();
+            console.log("Connected to MongoDB!");
+
+            const database = client.db("ecomm"); 
+            const collection = database.collection("products");
+            const result = await collection.insertOne(productJSON);
+            
+            console.log("Insertion result:", result);
+            console.log(`${result.insertedCount} document inserted into DB`);
+            console.log("---------------SAVED PRODUCT DETAILS TO MONGO ------------------");
+            if(result.acknowledged){
+              return res.status(200).json([{"message":"insert success"}]);
+            }
+            else{
+              return res.status(500).send("Error adding product!");
+            }
+          } finally {
+            await client.close();
+            console.log("MongoDB connection closed.");
+          }
+        }
+        run().catch(console.error);
     }
-  }
-  run().catch(console.error);
+  });
 });
 
 app.post("/addCategory", (req, res) => {

@@ -1,6 +1,7 @@
 async function populateProductsBySearchTerm(searchTerm)
 {
-    const response = await fetch(`http://localhost:4000/search/${searchTerm}`);
+    const currentHost = window.location.protocol+'//'+window.location.host;
+    const response = await fetch(`${currentHost}/search/${searchTerm}`);
     const resultscount = document.querySelector(".results");
     if(response.ok)
     {

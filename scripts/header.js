@@ -15,6 +15,7 @@ $.ajax({
             activeCategories += activeCategoryEle;
         }
         const headerElement = document.querySelector(".globalheader");
+        const currentHost = window.location.protocol+'//'+window.location.host;
         var str =   `<nav class="navbar navbar-expand-lg bg-body-tertiary">
                             <div class="container-fluid">
                             <a class="navbar-brand" href="/index.html">myCommerce</a>
@@ -28,7 +29,7 @@ $.ajax({
                                 </li>`+ activeCategories
                                         +`
                                 <li class="nav-item">
-                                <a class="nav-link" href="http://localhost:5050/mycart.html">Cart</a>
+                                <a class="nav-link" href="${currentHost}/mycart.html">Cart</a>
                                 </li>
                                 <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

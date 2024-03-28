@@ -14,24 +14,8 @@ async function populateProductsAPIbyprodID(prodID)
                         <div class="btn btn-primary btn-add-to-cart" onclick="updateCart(${prodID},'add')">ADD TO CART</div>`;
     prodimgdiv.innerHTML = imgdivstr;
     prodDetailsdiv.innerHTML = prodDetails;
-
+    } 
     
-    
-    // for (let i = 0; i < data.length; i++) {
-    //     var str =   `<div class="col" data-num="${i+1}">
-    //                     <div class="card" style="width: 18rem;">
-    //                             <img src="${data[i].image}" class="card-img-top" alt="...">
-    //                             <div class="card-body">
-    //                             <h5 class="card-title">${data[i].title}</h5>
-    //                             <p class="card-text">${data[i].description}</p>
-    //                             <a href="" class="btn btn-primary">Add to cart</a>
-    //                         </div>
-    //                     </div>
-    //                 </div>`;
-    //     prodList.innerHTML += str;
-      } 
-
-
 const urlParams = new URLSearchParams(location.search);
 if(urlParams.has('prodid')){
     var prodidVal = urlParams.get('prodid');
