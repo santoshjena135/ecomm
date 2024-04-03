@@ -15,3 +15,29 @@
     overflow: auto;
     margin-top: 20px;
 }
+.card{
+    border: none !important;
+    cursor: pointer;
+}
+
+.card-img-top{
+    object-fit: contain;
+    height: 250px;
+    transition: transform 0.3s ease;
+}
+
+.card-img-top:hover {
+    transform: scale(1.05);
+}
+
+.linkArea{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 10;
+}
+
+.linkArea:hover + .card-img-top {
+    transform: scale(1.1); /* Zoom the card image when hovering over the link */
+}
+

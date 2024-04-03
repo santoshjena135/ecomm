@@ -7,7 +7,42 @@
   <!-- Bootstrap CSS -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body style="visibility: hidden;">
+
+  <script>
+    authenticate();
+    function authenticate(){
+      var token = (new URLSearchParams(window.location.search)).get('authstatus');
+      if(token==="failed"){
+        var uname = prompt("Authentication Failed! Re-enter Username");
+      }
+      else{
+        var uname = prompt("Enter Username");
+      }
+      var pass = prompt("Enter Password for user-> "+uname);
+      const postData = {
+              un: uname,
+              pw: pass
+          };
+          fetch('/auth', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(postData)
+          })
+          .then(response => {
+            if(!response.ok){
+              window.location.href = "/admin.html?authstatus=failed";
+            }
+            else{
+              document.body.style.visibility = 'visible';
+              var newUrl = window.location.href.replace('authstatus=failed', 'authstatus=true');
+              history.replaceState(null, '', newUrl);
+            }
+          })
+      }
+  </script>
 
   <!-- Button to trigger add product modal -->
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addProductModal" id="addProductBtn">

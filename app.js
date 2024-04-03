@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config();
 const https = require('https');
 const cookieParser = require('cookie-parser');
 const { createProxyMiddleware } = require('http-proxy-middleware');
@@ -97,6 +98,23 @@ app.get('/checkCookie',(req,res)=>{
 app.get("/index", (req, res) => {
   res.render('index');
 });
+
+
+//below are the requirements for /auth
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.post("/auth", (req, res) => {
+    const uname = req.body.un;
+    const pass = req.body.pw;
+    if(uname === process.env.ADMIN_USERNAME && pass === process.env.ADMIN_PASSWORD)
+    {
+        return res.status(200).send("Authenticated!");
+    }
+    else{
+        return res.status(404).send("Wrong Password!");
+    }
+  });
 
 //<------------ Routes List Ends ------------->
 
