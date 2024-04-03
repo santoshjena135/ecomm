@@ -19,8 +19,10 @@ async function populateProductsAPIbyCategory(categoryType)
                                     </div>
                                     <div class="col">
                                         <!-- <a href="/productpage.html?prodid=${data[i].id}" class="btn btn-primary">View</a> -->
-                                        <a href="/product.${data[i].id}.${sanitizeTitle(data[i].title)}" class="btn btn-primary">View</a>
-                                    </div>
+                                        <!-- <a href="/product.${data[i].id}.${sanitizeTitle(data[i].title)}" class="btn btn-primary">View</a> -->
+                                        <div class="ratings">
+                                            ${createStarDiv(Math.round(data[i].rating.rate))}
+                                        </div>
                                 </div>
                             </div>
                         </div>
@@ -48,6 +50,22 @@ function sanitizeTitle(title) {
 
 function openPDP(pdpLink){
     window.location.href= pdpLink;
+}
+
+function createStarDiv(rating){
+    var ele='';
+    for(let star=1; star<=5; star++){
+        var spanElement = document.createElement("span");
+        if(star<=rating)
+        {
+            spanElement.className = "fa fa-star checked";
+        }
+        else{
+            spanElement.className = "fa fa-star unchecked";
+        }
+        ele=ele+spanElement.outerHTML;
+    }
+    return ele;
 }
 
 populateProductsAPIbyCategory(catVal);
