@@ -14,6 +14,10 @@ $.ajax({
                         </li>`;
             activeCategories += activeCategoryEle;
         }
+        var searchQuery = '';
+        if(window.location.href.includes('search.html?q=')){
+            searchQuery = window.location.href.split("?q=")[1];
+        }
         const headerElement = document.querySelector(".globalheader");
         const currentHost = window.location.protocol+'//'+window.location.host;
         var str =   `<nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -55,6 +59,7 @@ $.ajax({
                         </nav>
                     `;
         headerElement.innerHTML = str;
+        document.getElementById('searchbox').value = searchQuery;
         console.log("Categories Populated from /categories/active");
         
         $('#searchbtn').on('click',()=>{
@@ -78,9 +83,8 @@ $.ajax({
                     var bannerSpan = document.createElement("span");
                     bannerSpan.textContent = sitebanner[0].bannerMessage;
                     sitebannerele.appendChild(bannerSpan);
+                    document.body.prepend(sitebannerele);
                 }
-                console.log("SitebannerElement->",typeof(sitebannerele));
-                document.body.prepend(sitebannerele);
             },
             error: function(xhr, status, error) {
                 console.log("No Active Sitebanner")
