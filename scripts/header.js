@@ -56,6 +56,7 @@ $.ajax({
                     `;
         headerElement.innerHTML = str;
         console.log("Categories Populated from /categories/active");
+        
         $('#searchbtn').on('click',()=>{
             const searchTerm = $('#searchbox').val();
             if(searchTerm && searchTerm!=''){
@@ -65,9 +66,30 @@ $.ajax({
                 console.log("Enter a valid searchTerm!");
             }
         });
+
+        $.ajax({
+            type: 'GET',
+            url: '/sitebanner',
+            success: function(sitebanner) {
+                if(sitebanner[0].isActive){
+                    var sitebannerele = document.createElement("nav");
+                    sitebannerele.setAttribute("class", "sitebanner");
+                    sitebannerele.setAttribute("style", sitebanner[0].customStyle);
+                    var bannerSpan = document.createElement("span");
+                    bannerSpan.textContent = sitebanner[0].bannerMessage;
+                    sitebannerele.appendChild(bannerSpan);
+                }
+                console.log("SitebannerElement->",typeof(sitebannerele));
+                document.body.prepend(sitebannerele);
+            },
+            error: function(xhr, status, error) {
+                console.log("No Active Sitebanner")
+              console.error(xhr.responseText);}
+          }); 
        },
     error: function(xhr, status, error) {
       console.error(xhr.responseText);}
-  }); 
+  });
 
+                  
 

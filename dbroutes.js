@@ -307,5 +307,69 @@ app.post("/addCategory", (req, res) => {
   run().catch(console.error);
 });
 
+//to get sitebanner
+app.get("/sitebanner", (req, res) => {
+  const client = new MongoClient(uri,clientOptions);
+    async function run() {
+      try {
+        await client.connect();
+        console.log("Connected to MongoDB!");
+  
+        const database = client.db("ecomm"); 
+        const collection = database.collection("sitebanner");
+        
+        const sitebanner = await collection.find({}).toArray();
+        if(sitebanner){
+          console.log("Sitebanner_Details: ",sitebanner);
+          return res.send(sitebanner);
+        }
+        else{
+          return res.status(404).send("Sitebanner not found in Mongo/is inactive!");
+        }
+  
+      } finally {
+        await client.close();
+        console.log("MongoDB connection closed.");
+      }
+    }
+  
+    run().catch(console.error);
+  });
+
+//update sitebanner
+app.post("/sitebanner", (req, res) => {
+  const formBanner = req.body;
+  const client = new MongoClient(uri,clientOptions);
+  async function run() {
+    try {
+      await client.connect();
+      console.log("Connected to MongoDB!");
+
+      const database = client.db("ecomm"); 
+      const collection = database.collection("sitebanner");
+
+      const result = await collection.updateOne(
+          { }, // updates all docs
+          { $set: { customStyle: formBanner.customStyle,
+                     bannerMessage: formBanner.bannerMessage,
+                      isActive: formBanner.isActive } }
+      );
+        console.log("Insertion result:", result);
+        console.log(`${result.insertedCount} document updated into DB`);
+        if(result.acknowledged){
+          return res.status(200).json([{"message":"insert success"}]);
+        }
+        else{
+          return res.status(500).send("Error updating banner!");
+        }
+  
+    } finally {
+      await client.close();
+      console.log("MongoDB connection closed.");
+    }
+  }
+  run().catch(console.error);
+});
+
 
 app.listen(PORT, () => console.log(`DB-Routes service running on port ${PORT} 🔥`));
