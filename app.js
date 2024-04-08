@@ -13,6 +13,13 @@ const cart_service_url = process.env.CART_SERVICE_URL || 'http://localhost:3000'
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use((req, res, next) => {
+    var downtime = process.env.ECOMM_DOWNTIME === 'true';
+    //checks if there is downtime for the public accessing /any-routes without the required header key and value
+    if(downtime===true && (req.headers['ecomm-downtime-access'] != process.env.ECOMM_DOWNTIME_ACCESS))
+    {
+            return res.render('maintenance');
+    }
+    
     // If the req is not having a cookie already, it creates a new cookie and sends to user.
     if (!req.cookies.user_id) {
         const newUserId = uuid.v4();
