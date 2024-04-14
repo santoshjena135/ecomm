@@ -81,7 +81,7 @@ $.ajax({
                     sitebannerele.setAttribute("class", "sitebanner");
                     sitebannerele.setAttribute("style", sitebanner[0].customStyle);
                     var bannerSpan = document.createElement("span");
-                    bannerSpan.textContent = sitebanner[0].bannerMessage;
+                    bannerSpan.innerHTML = sitebanner[0].bannerMessage;
                     sitebannerele.appendChild(bannerSpan);
                     document.body.prepend(sitebannerele);
                 }

@@ -1,6 +1,6 @@
 async function populateProductsAPIbyprodID(prodID)
 {
-    const response = await fetch(`https://fakestoreapi.com/products/${prodID}`);
+    const response = await fetch(`/products/${prodID}`);
     var data = await response.json();
     console.log(data);
     const prodimgdiv = document.querySelector(".prodimgdiv");
