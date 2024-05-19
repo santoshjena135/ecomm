@@ -23,7 +23,11 @@ app.use((req, res, next) => {
     // If the req is not having a cookie already, it creates a new cookie and sends to user.
     if (!req.cookies.user_id) {
         const newUserId = uuid.v4();
+        console.log("NEW USER DETECTED, ASSIGNING ID :-",newUserId);
         res.cookie('user_id', newUserId, { maxAge: 3 * 24 * 60 * 60 * 1000 , httpOnly: true });
+    }
+    else{
+        console.log("EXISTING USER DETECTED WITH ID :-",req.cookies.user_id);
     }
     next();
 });

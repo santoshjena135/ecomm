@@ -20,7 +20,7 @@ app.get("/cart", (req, res) => {
   }
   else{
     const userCart = userCarts[user];
-    res.send(userCart);
+    (userCart ? res.send(userCart) : res.send({}));
   }
 });
 
