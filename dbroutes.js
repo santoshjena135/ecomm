@@ -22,6 +22,7 @@ const clientOptions = {
     deprecationErrors: true,
   }
 };
+const dataBasePointer = process.env.DATABASE_NAME;
 
 //AWS Confs
 AWS.config.update({
@@ -39,7 +40,7 @@ app.get("/products", (req, res) => {
         await client.connect();
         console.log("Connected to MongoDB!");
   
-        const database = client.db("ecomm"); 
+        const database = client.db(dataBasePointer); 
         const collection = database.collection("products");
         
         const products = await collection.find({}).toArray();
@@ -69,7 +70,7 @@ app.get("/products/:id", (req, res) => {
       await client.connect();
       console.log("Connected to MongoDB!");
 
-      const database = client.db("ecomm"); 
+      const database = client.db(dataBasePointer); 
       const collection = database.collection("products");
       
       const product = await collection.findOne({ id: Number(prodid) });
@@ -99,7 +100,7 @@ app.get("/category/:category", (req, res) => {
       await client.connect();
       console.log("Connected to MongoDB!");
 
-      const database = client.db("ecomm"); 
+      const database = client.db(dataBasePointer); 
       const collection = database.collection("products");
       
       const product = await collection.find({ category: String(category) }).sort({id:1}).toArray();
@@ -129,7 +130,7 @@ app.get("/categories/:type", (req, res) => {
       await client.connect();
       console.log("Connected to MongoDB!");
 
-      const database = client.db("ecomm"); 
+      const database = client.db(dataBasePointer); 
       const collection = database.collection("categories");
       
       const formatCategory = (category) => ({
@@ -179,7 +180,7 @@ app.get("/search/:searchTerm", (req, res) => {
       await client.connect();
       console.log("Connected to MongoDB!");
 
-      const database = client.db("ecomm"); 
+      const database = client.db(dataBasePointer); 
       const collection = database.collection("products");
       
       const product = await collection.find({
@@ -242,7 +243,7 @@ app.post("/addProduct", upload.single('image'), (req, res) => {
             await client.connect();
             console.log("Connected to MongoDB!");
 
-            const database = client.db("ecomm"); 
+            const database = client.db(dataBasePointer); 
             const collection = database.collection("products");
             const result = await collection.insertOne(productJSON);
             
@@ -280,7 +281,7 @@ app.post("/addCategory", (req, res) => {
       await client.connect();
       console.log("Connected to MongoDB!");
 
-      const database = client.db("ecomm"); 
+      const database = client.db(dataBasePointer); 
       const collection = database.collection("categories");
 
       const checkExisting = await collection.findOne({'categoryName':categoryJSON.categoryName});
@@ -315,7 +316,7 @@ app.get("/sitebanner", (req, res) => {
         await client.connect();
         console.log("Connected to MongoDB!");
   
-        const database = client.db("ecomm"); 
+        const database = client.db(dataBasePointer); 
         const collection = database.collection("sitebanner");
         
         const sitebanner = await collection.find({}).toArray();
@@ -345,7 +346,7 @@ app.post("/sitebanner", (req, res) => {
       await client.connect();
       console.log("Connected to MongoDB!");
 
-      const database = client.db("ecomm"); 
+      const database = client.db(dataBasePointer); 
       const collection = database.collection("sitebanner");
 
       const result = await collection.updateOne(
