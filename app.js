@@ -37,6 +37,16 @@ app.use(express.static('scripts'));
 app.use(express.static('styles'));
 app.use(express.static(__dirname)); //can server static html files on same level as this index.js ex: index.html, cart.html on port 5050
 app.use('/cart', createProxyMiddleware({ target: cart_service_url, changeOrigin: true }));
+app.use('/flushcart', createProxyMiddleware({ target: cart_service_url, changeOrigin: true }));
+app.use('/createorder', createProxyMiddleware({
+    target: cart_service_url,
+    changeOrigin: true,
+    pathRewrite: (path, req) => {
+      const amount = req.query.amount;
+      return `/createorder?amount=${amount}`;
+    }
+  }));
+app.use('/saveorder',createProxyMiddleware({ target: db_service_url, changeOrigin: true }));
 app.use('/sitebanner', createProxyMiddleware({ target: db_service_url, changeOrigin: true }));
 app.use('/addProduct', createProxyMiddleware({ target: db_service_url, changeOrigin: true }));
 app.use('/addCategory', createProxyMiddleware({ target: db_service_url, changeOrigin: true }));

@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const path = require('path');
 const AWS = require('aws-sdk');
@@ -10,6 +11,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const PORT = process.env.PORT || 4000;
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config();
 const username = process.env.MONGODB_USERNAME;
@@ -372,5 +374,44 @@ app.post("/sitebanner", (req, res) => {
   run().catch(console.error);
 });
 
+app.post("/saveorder", (req, res) => {
+  const body = req.body;
+  const user_id = req.cookies.user_id;
+  const client = new MongoClient(uri,clientOptions);
+  const orderJSON = {
+    "user_id": user_id,
+    "cart_items": body.cart_items,
+    "amount": parseFloat(body.cart_amount),
+    "razorpay_payment_id": body.razorpay_payment_id,
+    "razorpay_order_id": body.razorpay_order_id,
+    "razorpay_signature": body.razorpay_signature,
+    "status": "confirmed"
+  };
+  console.log("Inserting Order JSON", orderJSON);
+  async function run() {
+    try {
+      await client.connect();
+      console.log("Connected to MongoDB!");
+
+      const database = client.db(dataBasePointer); 
+      const collection = database.collection("orders");
+
+      const result = await collection.insertOne(orderJSON);
+      console.log("Insertion result:", result);
+      console.log(`${result.insertedCount} document inserted into DB`);
+      if(result.acknowledged){
+        return res.status(200).json([{"message":"insert success"}]);
+      }
+      else{
+        return res.status(500).send("Error adding product!");
+      }
+    
+    } finally {
+      await client.close();
+      console.log("MongoDB connection closed.");
+    }
+  }
+  run().catch(console.error);
+});
 
 app.listen(PORT, () => console.log(`DB-Routes service running on port ${PORT} 🔥`));
