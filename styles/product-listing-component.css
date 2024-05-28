@@ -15,3 +15,47 @@
     overflow: auto;
     margin-top: 20px;
 }
+.card{
+    border: none !important;
+    cursor: pointer;
+    text-align: left !important;
+    margin-bottom: 20px;
+    background-color: aqua;
+}
+h5.card-title{
+    font-size: 1.00rem;
+}
+.card-title{
+    height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Number of lines to show */
+    -webkit-box-orient: vertical;
+}
+
+.card-img-top{
+    object-fit: contain;
+    height: 250px;
+    transition: transform 0.5s ease;
+}
+
+/* .card-img-top:hover {
+    transform: scale(1.05);
+} */
+
+.linkArea{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 10;
+}
+
+.linkArea:hover + .card-img-top {
+    transform: scale(1.05); /* Zoom the card image when hovering over the link */
+}
+
+.ratings{
+    text-align: right;
+}
+

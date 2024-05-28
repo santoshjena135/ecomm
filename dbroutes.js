@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const path = require('path');
 const AWS = require('aws-sdk');
@@ -10,6 +11,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const PORT = process.env.PORT || 4000;
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config();
 const username = process.env.MONGODB_USERNAME;
@@ -22,6 +24,7 @@ const clientOptions = {
     deprecationErrors: true,
   }
 };
+const dataBasePointer = process.env.DATABASE_NAME;
 
 //AWS Confs
 AWS.config.update({
@@ -39,7 +42,7 @@ app.get("/products", (req, res) => {
         await client.connect();
         console.log("Connected to MongoDB!");
   
-        const database = client.db("ecomm"); 
+        const database = client.db(dataBasePointer); 
         const collection = database.collection("products");
         
         const products = await collection.find({}).toArray();
@@ -69,7 +72,7 @@ app.get("/products/:id", (req, res) => {
       await client.connect();
       console.log("Connected to MongoDB!");
 
-      const database = client.db("ecomm"); 
+      const database = client.db(dataBasePointer); 
       const collection = database.collection("products");
       
       const product = await collection.findOne({ id: Number(prodid) });
@@ -99,7 +102,7 @@ app.get("/category/:category", (req, res) => {
       await client.connect();
       console.log("Connected to MongoDB!");
 
-      const database = client.db("ecomm"); 
+      const database = client.db(dataBasePointer); 
       const collection = database.collection("products");
       
       const product = await collection.find({ category: String(category) }).sort({id:1}).toArray();
@@ -129,7 +132,7 @@ app.get("/categories/:type", (req, res) => {
       await client.connect();
       console.log("Connected to MongoDB!");
 
-      const database = client.db("ecomm"); 
+      const database = client.db(dataBasePointer); 
       const collection = database.collection("categories");
       
       const formatCategory = (category) => ({
@@ -179,7 +182,7 @@ app.get("/search/:searchTerm", (req, res) => {
       await client.connect();
       console.log("Connected to MongoDB!");
 
-      const database = client.db("ecomm"); 
+      const database = client.db(dataBasePointer); 
       const collection = database.collection("products");
       
       const product = await collection.find({
@@ -242,7 +245,7 @@ app.post("/addProduct", upload.single('image'), (req, res) => {
             await client.connect();
             console.log("Connected to MongoDB!");
 
-            const database = client.db("ecomm"); 
+            const database = client.db(dataBasePointer); 
             const collection = database.collection("products");
             const result = await collection.insertOne(productJSON);
             
@@ -280,7 +283,7 @@ app.post("/addCategory", (req, res) => {
       await client.connect();
       console.log("Connected to MongoDB!");
 
-      const database = client.db("ecomm"); 
+      const database = client.db(dataBasePointer); 
       const collection = database.collection("categories");
 
       const checkExisting = await collection.findOne({'categoryName':categoryJSON.categoryName});
@@ -307,5 +310,108 @@ app.post("/addCategory", (req, res) => {
   run().catch(console.error);
 });
 
+//to get sitebanner
+app.get("/sitebanner", (req, res) => {
+  const client = new MongoClient(uri,clientOptions);
+    async function run() {
+      try {
+        await client.connect();
+        console.log("Connected to MongoDB!");
+  
+        const database = client.db(dataBasePointer); 
+        const collection = database.collection("sitebanner");
+        
+        const sitebanner = await collection.find({}).toArray();
+        if(sitebanner){
+          console.log("Sitebanner_Details: ",sitebanner);
+          return res.send(sitebanner);
+        }
+        else{
+          return res.status(404).send("Sitebanner not found in Mongo/is inactive!");
+        }
+  
+      } finally {
+        await client.close();
+        console.log("MongoDB connection closed.");
+      }
+    }
+  
+    run().catch(console.error);
+  });
+
+//update sitebanner
+app.post("/sitebanner", (req, res) => {
+  const formBanner = req.body;
+  const client = new MongoClient(uri,clientOptions);
+  async function run() {
+    try {
+      await client.connect();
+      console.log("Connected to MongoDB!");
+
+      const database = client.db(dataBasePointer); 
+      const collection = database.collection("sitebanner");
+
+      const result = await collection.updateOne(
+          { }, // updates all docs
+          { $set: { customStyle: formBanner.customStyle,
+                     bannerMessage: formBanner.bannerMessage,
+                      isActive: formBanner.isActive } }
+      );
+        console.log("Insertion result:", result);
+        console.log(`${result.insertedCount} document updated into DB`);
+        if(result.acknowledged){
+          return res.status(200).json([{"message":"insert success"}]);
+        }
+        else{
+          return res.status(500).send("Error updating banner!");
+        }
+  
+    } finally {
+      await client.close();
+      console.log("MongoDB connection closed.");
+    }
+  }
+  run().catch(console.error);
+});
+
+app.post("/saveorder", (req, res) => {
+  const body = req.body;
+  const user_id = req.cookies.user_id;
+  const client = new MongoClient(uri,clientOptions);
+  const orderJSON = {
+    "user_id": user_id,
+    "cart_items": body.cart_items,
+    "amount": parseFloat(body.cart_amount),
+    "razorpay_payment_id": body.razorpay_payment_id,
+    "razorpay_order_id": body.razorpay_order_id,
+    "razorpay_signature": body.razorpay_signature,
+    "status": "confirmed"
+  };
+  console.log("Inserting Order JSON", orderJSON);
+  async function run() {
+    try {
+      await client.connect();
+      console.log("Connected to MongoDB!");
+
+      const database = client.db(dataBasePointer); 
+      const collection = database.collection("orders");
+
+      const result = await collection.insertOne(orderJSON);
+      console.log("Insertion result:", result);
+      console.log(`${result.insertedCount} document inserted into DB`);
+      if(result.acknowledged){
+        return res.status(200).json([{"message":"insert success"}]);
+      }
+      else{
+        return res.status(500).send("Error adding product!");
+      }
+    
+    } finally {
+      await client.close();
+      console.log("MongoDB connection closed.");
+    }
+  }
+  run().catch(console.error);
+});
 
 app.listen(PORT, () => console.log(`DB-Routes service running on port ${PORT} 🔥`));
