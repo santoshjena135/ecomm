@@ -1,6 +1,7 @@
 async function populateProductsBySearchTerm(searchTerm)
 {
-    const response = await fetch(`http://localhost:4000/search/${searchTerm}`);
+    const currentHost = window.location.protocol+'//'+window.location.host;
+    const response = await fetch(`${currentHost}/search/${searchTerm}`);
     const resultscount = document.querySelector(".results");
     if(response.ok)
     {
@@ -9,17 +10,21 @@ async function populateProductsBySearchTerm(searchTerm)
         for (let i = 0; i < data.length; i++) {
             var str =   `<div class="col" data-num="${i+1}">
                             <div class="card" style="width: 18rem;">
+                                <a href="/product.${data[i].id}.${sanitizeTitle(data[i].title)}" class="linkArea"></a>
                                     <img src="${data[i].image}" class="card-img-top" alt="...">
                                     <div class="card-body">
                                     <h5 class="card-title">${data[i].title}</h5>
-                                    <p class="card-text">${(data[i].description).slice(0,200)} ...</p>
+                                    <!-- <p class="card-text">${(data[i].description).slice(0,200)} ...</p> -->
                                     <div class="row">
                                         <div class="col">
                                             <p class="card-text">${data[i].price} USD</p>
                                         </div>
                                         <div class="col">
-                                            <a href="/productpage.html?prodid=${data[i].id}" class="btn btn-primary">View</a>
-                                            <a href="/product/${data[i].id}" class="btn btn-primary">SSR-View</a>
+                                            <!-- <a href="/productpage.html?prodid=${data[i].id}" class="btn btn-primary">View</a> -->
+                                            <!-- <a href="/product/${data[i].id}" class="btn btn-primary">SSR-View</a> -->
+                                            <div class="ratings">
+                                                ${createStarDiv(Math.round(data[i].rating.rate))}
+                                            </div>
                                             </div>
                                     </div>
                                 </div>
@@ -42,3 +47,29 @@ if(urlParams.has('q')){
     var searchTerm = urlParams.get('q');
 }
 populateProductsBySearchTerm(searchTerm);
+
+function createStarDiv(rating){
+    var ele='';
+    for(let star=1; star<=5; star++){
+        var spanElement = document.createElement("span");
+        if(star<=rating)
+        {
+            spanElement.className = "fa fa-star checked";
+        }
+        else{
+            spanElement.className = "fa fa-star unchecked";
+        }
+        ele=ele+spanElement.outerHTML;
+    }
+    return ele;
+};
+
+function sanitizeTitle(title) {
+    title = title.toLowerCase();
+    // Remove special characters and replace spaces with hyphens
+    title = title.replace(/[^\w\s-]/g, '') // Remove special characters except hyphen
+                 .replace(/\s+/g, '-')       // Replace spaces with hyphens
+                 .replace(/--+/g, '-')       // Replace consecutive hyphens with single hyphen
+                 .trim();                    // Trim leading/trailing spaces
+    return title;
+}
