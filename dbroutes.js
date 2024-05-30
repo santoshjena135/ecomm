@@ -385,7 +385,8 @@ app.post("/saveorder", (req, res) => {
     "razorpay_payment_id": body.razorpay_payment_id,
     "razorpay_order_id": body.razorpay_order_id,
     "razorpay_signature": body.razorpay_signature,
-    "status": "confirmed"
+    "status": "confirmed",
+    "order_timestamp": body.order_timestamp
   };
   console.log("Inserting Order JSON", orderJSON);
   async function run() {
@@ -411,6 +412,36 @@ app.post("/saveorder", (req, res) => {
       console.log("MongoDB connection closed.");
     }
   }
+  run().catch(console.error);
+});
+
+//get orders by user_id in cookies
+app.get("/orders", (req, res) => {
+  const user_id = req.cookies.user_id;
+  const client = new MongoClient(uri,clientOptions);
+  async function run() {
+    try {
+      await client.connect();
+      console.log("Connected to MongoDB!");
+
+      const database = client.db(dataBasePointer); 
+      const collection = database.collection("orders");
+      
+      const orders = await collection.find({ user_id: String(user_id) }).sort({ order_timestamp: -1 }).toArray();
+      if(orders && orders.length!=0){
+        //console.log("Order_Details: ",orders);
+        return res.send(orders);
+      }
+      else{
+        return res.status(404).send("Orders with user_id -> "+user_id+" not found in MongoDB");
+      }
+
+    } finally {
+      await client.close();
+      console.log("MongoDB connection closed.");
+    }
+  }
+
   run().catch(console.error);
 });
 

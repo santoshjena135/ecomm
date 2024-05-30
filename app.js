@@ -47,6 +47,7 @@ app.use('/createorder', createProxyMiddleware({
     }
   }));
 app.use('/saveorder',createProxyMiddleware({ target: db_service_url, changeOrigin: true }));
+app.use('/orders',createProxyMiddleware({ target: db_service_url, changeOrigin: true }));
 app.use('/sitebanner', createProxyMiddleware({ target: db_service_url, changeOrigin: true }));
 app.use('/addProduct', createProxyMiddleware({ target: db_service_url, changeOrigin: true }));
 app.use('/addCategory', createProxyMiddleware({ target: db_service_url, changeOrigin: true }));
